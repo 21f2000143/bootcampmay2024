@@ -11,9 +11,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+    <script src="/static/Vue/vue.js"></script>
     <script src="https://unpkg.com/vue-router@2.8.1/dist/vue-router.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-
+    <!-- <script src="https://unpkg.com/vuex@2.0.0"></script> -->
     <style>
         body {
             display: flex;
@@ -141,15 +141,29 @@
 
 <body>
     <div id="app">
-        <p>[$ message $]</p>
         <router-view></router-view>
     </div>
 
     <script type="module">
         import HomeView from "../static/views/HomeView.js"
+        import UserApp from "../static/views/UserApp.js";
+        import AdminApp from "../static/views/AdminApp.js";
+        import ManagerApp from "../static/views/ManagerApp.js";
+        import RegisterCompo from "../static/views/RegisterCompo.js";
+        import LoginCompo from "../static/views/LoginCompo.js";
 
         const routes = [
-            { path: '/', component: HomeView }
+            { path: '/', component: HomeView },
+            { path: '/login', component: LoginCompo },
+            { path: '/register', component: RegisterCompo },
+
+            { path: '/admin', component: AdminApp },
+            {
+                path: '/manager', component: ManagerApp
+            },
+            {
+                path: '/user', component: UserApp
+            }
         ];
 
         const router = new VueRouter({
@@ -157,12 +171,12 @@
         })
         var app = new Vue({
             el: "#app",
-            delimiters: ["[$", "$]"],
-            router: router,
-            data: {
-                message: "Hello World!"
-            }
+            router: router
         })
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
     </script>
 </body>
 

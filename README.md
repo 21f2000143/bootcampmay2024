@@ -4,3 +4,6 @@ A demo project for may 2024 bootcamp to build grocery app.
 
 ## To implement token based authentication
 [flask jwt framework](https://flask-jwt-extended.readthedocs.io/en/stable/installation.html)
+
+## explained
+### vuerouters redirections, admin creadendentials, tooltip

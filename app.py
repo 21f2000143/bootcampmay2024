@@ -2,14 +2,22 @@ from flask import Flask, render_template, jsonify, request
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from database import db
 from models import User, Product, Category, Order, Cart, RequestResponse
+from werkzeug.security import generate_password_hash
+
 
 app = Flask(__name__)
 app.secret_key = 'iojevaien8948q@aojiojae'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project.sqlite3'
 jwt = JWTManager(app)
 db.init_app(app)
+app.app_context().push()
 with app.app_context():
     db.create_all()
+exist_admin = User.query.filter_by(role='admin').first()
+if not exist_admin:
+    the_admin = User(email="sumit@gmail.com", name="Sumit Kumar", role="admin", password=generate_password_hash("password",method='scrypt'))
+    db.session.add(the_admin)
+    db.session.commit()
 
 
 # Register a callback function that takes whatever object is passed in as the
