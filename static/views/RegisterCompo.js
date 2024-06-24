@@ -66,15 +66,15 @@ const RegisterCompo = Vue.component('RegisterCompo', {
             "role": this.role
           }),
         });
-        if (response.status === 200) {
+        if (response.status === 201) {
           const data = await response.json();
-          alert(data.msg);
+          alert(data.message);
           if(this.$route.path!='/login'){
             this.$router.push('/login')
             this.closeCard()
           }
         } else if(response.status === 409) {
-          alert(data.msg);
+          alert(data.message);
         }
       } catch (error) {
         console.error(error);

@@ -20,6 +20,9 @@ const LoginCompo = Vue.component('LoginCompo', {
           <label for="exampleInputPassword1" class="form-label">Password</label>
           <input type="password" v-model="password" class="form-control" id="exampleInputPassword1">
         </div>
+        <div class="mb-3">
+        <label for="remember">Remember Me</label> <input id="remember" name="remember" type="checkbox" v-model="remember" value="y">
+        </div>
         <button type="submit" class="btn btn-outline-primary">Login</button>
       </form>
     </div>
@@ -32,24 +35,27 @@ const LoginCompo = Vue.component('LoginCompo', {
       name: '',
       password: '',
       role: '',
+      remember: '',
       message: ''
     }
   },
   methods: {
-    closeCard() {
-      if (this.$route.path != '/') {
+    closeCard(){
+      if(this.$route.path!='/'){
         this.$router.push('/')
       }
     },
     submitForm() {
-      fetch('http://127.0.0.1:5000/auth/login', {
+      fetch('http://127.0.0.1:5000/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           "email": this.email,
-          "password": this.password        }),
+          "password": this.password,
+          "remember": this.remember
+        }),
       })
         .then(response => {
           if (response.status == 200) {
@@ -86,9 +92,8 @@ const LoginCompo = Vue.component('LoginCompo', {
         .catch(error => {
           console.error('Error sending data:', error);
         });
-    },
+    }
     
-
-  }
+  },
 })
 export default LoginCompo;
