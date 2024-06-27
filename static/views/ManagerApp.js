@@ -143,13 +143,20 @@ const ManagerApp = Vue.component('ManagerApp', {
                 this.$router.push('/manager/notifications')
             }
         },
+        getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(";").shift();
+            return "";
+        },
         async logout() {
             try {
               const response = await fetch('http://127.0.0.1:5000/logout', {
-                method: 'GET',
+                method: 'POST',
                 headers: {
-                  
+                  'X-CSRF-TOKEN': this.getCookie("csrf_access_token"),
                 },
+                credentials: 'include',
               });
               if (response.status === 200) {
                 const data = await response.json();

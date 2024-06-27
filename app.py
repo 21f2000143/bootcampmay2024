@@ -7,7 +7,10 @@ from flask_jwt_extended import unset_jwt_cookies, set_access_cookies
 from flask_jwt_extended import create_access_token, get_jwt_identity
 from datetime import datetime
 import base64
+from backendjobs import workers
 from datetime import timedelta
+from flask_sse import sse
+
 
 
 current_user = None
@@ -18,19 +21,34 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///project.sqlite3'
 app.config['JWT_COOKIE_SECURE'] = False
 app.config['JWT_TOKEN_LOCATION'] = ['headers', 'cookies']
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)
+app.config['BROKER_CONNECTION_RETRY_ON_STARTUP'] = True
+app.config['CELERY_BROKER_URL'] = "redis://localhost:6379/1"
+app.config['CELERY_RESULT_BACKEND'] = "redis://localhost:6379/2"
+app.config['CELERY_TIMEZONE'] = "Asia/Kolkata"
+app.config['REDIS_URL'] = "redis://localhost:6379"
 # app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 jwt = JWTManager(app)
 db.init_app(app)
 app.app_context().push()
 with app.app_context():
     db.create_all()
+celery = workers.celery
+# Update with configuration
+celery.conf.update(
+    broker_url = app.config["CELERY_BROKER_URL"],
+    result_backend = app.config["CELERY_RESULT_BACKEND"],
+    timezone = app.config["CELERY_TIMEZONE"],
+    broker_connection_retry_on_startup=app.config["BROKER_CONNECTION_RETRY_ON_STARTUP"]
+)
+celery.Task = workers.ContextTask
+app.app_context().push()
 exist_admin = User.query.filter_by(role='admin').first()
 if not exist_admin:
     the_admin = User(email="sumit@gmail.com", name="Sumit Kumar", role="admin", password=generate_password_hash("password",method='scrypt'))
     db.session.add(the_admin)
     db.session.commit()
 
-
+app.register_blueprint(sse, url_prefix='/stream')
 # Register a callback function that takes whatever object is passed in as the
 # identity when creating JWTs and converts it to a JSON serializable format.
 @jwt.user_identity_loader
@@ -813,5 +831,6 @@ def product():
 
 app.register_blueprint(auth)
 app.register_blueprint(main)
+from backendjobs.admin import *
 if __name__ == '__main__':
     app.run(debug=True)
